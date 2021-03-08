@@ -518,7 +518,7 @@ You can download the files you need [by clicking on this link here](https://gith
 
 Make sure you unzip these into a new folder, and then start a new project file based on that folder, like we learnt in the previous module.
 
-You should need to install some of the packages used before proceeding. Make sure you have these installed and loaded, by running the first code chunk, before you try to start solving any of the questions!
+You will likely need to install some of the packages used before proceeding. Make sure you have these installed and loaded, by running the first code chunk, before you try to start solving any of the questions!
 
 
 
