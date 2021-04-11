@@ -1,16 +1,16 @@
-# Module 7 Exercises
+# Module 7 Exercices
 
 ## Setup
 
-To begin with we will need to load the libraries and data we will use in this session. There are many new libraries to be used so make sure you install these before proceeding!
+Pour commencer, nous devons charger les packages et les données que nous utiliserons dans cette session. Il y a beaucoup de nouvelles packages à utiliser, alors assurez-vous de les installer avant de continuer!
 
 ```{r}
-#you should have these already!
+#vous devriez déjà les avoir!
 library(dplyr)
 library(ggplot2)
 library(janitor)
 
-#these are probably new
+#Ceux-ci sont probablement nouveaux
 library(lmerTest)
 library(multcomp)
 library(emmeans)
@@ -21,20 +21,20 @@ library(agridat)
 ```
 
 
-## Exercise 1
+## Exercice 1
 
-We are going to start with a seemingly simple example from a data set which is built into R from the `agridat` library.
+Nous allons commencer par un exemple apparemment simple à partir d'un ensemble de données qui est construit dans R à partir de la bibliothèque `agridat`.
 
-With built in data sets the first time we want to use them we refer to them by name using the `data` function. This dataset is from an experiment of 8 different barley varieties which compares the yields. 
+Avec les jeux de données intégrés, la première fois que nous voulons les utiliser, nous les désignons par leur nom en utilisant la fonction `data`. Cet jeu de données est issu d'une expérience de 8 variétés d'orge différentes qui compare les rendements.
 
-Run the code below to import this data and see the structure. Each variety is replicated 20 times in this experiment on the same field. The grid layout of the field is captured by the row and column fields, the different barley varieties are in the gen column and the yields are in the yield column.
+Exécutez le code ci-dessous pour importer ces données et voir la structure. Chaque variété est reproduite 20 fois dans cette expérience sur le même champ. La disposition en grille du champ est capturée par les champs de ligne et de colonne, les différentes variétés d'orge sont dans la colonne gen et les rendements sont dans la colonne yield.
 ```{r}
 data(beaven.barley)
 beaven.barley
 ```
-To begin with let us assume our observations are independent - they are all on the same field after all!
+Pour commencer, supposons que nos observations sont indépendantes - elles sont toutes sur le même terrain après tout !
 
-*Question 1 : Make a boxplot showing yields by genotype using `ggplot`. Interpret what this is showing* 
+*Question 1 : Faites un boxplot montrant les rendements par génotype en utilisant `ggplot`. Interprétez ce que cela montre* 
 
 ```{r}
 
@@ -42,7 +42,7 @@ ggplot(data=beaven.barley,aes(y=yield,x=gen))+
   geom_boxplot()
 
 ```
-*Question 2 : Calculate the mean and standard deviations of yield by genotype using `group_by` and `summarise`* 
+*Question 2: Calculez la moyenne et les écarts-types du rendement par génotype en utilisant `group_by` et` summary`* 
 
 ```{r}
 beaven.barley %>%
@@ -50,26 +50,26 @@ beaven.barley %>%
     summarise(mean(yield),sd(yield))
 ```
 
-*Question 3: Fit an ANOVA model of yield by genotype using the `lm` function. Store it as an object called barley1`*
+*Question 3: Ajuster un modèle ANOVA de rendement par génotype en utilisant la fonction `lm`. Stockez-le comme un objet appelé `barley1`*
 
 ```{r}
 barley1<-lm(yield~gen,data=beaven.barley)
 ```
 
-*Question 4: Use the summary and anova functions on the model to provide some statistics about the results. What do these tell you?*
+*Question 4: Utilisez les fonctions de résumé et d'anova sur le modèle pour fournir des statistiques sur les résultats. Qu'est-ce que cela vous dit?*
 
 ```{r}
 anova(barley1)
 summary(barley1)
 ```
 
-*Question 5: Use the plot function to check the residuals. Does anything look problematic?*
+*Question 5: Utilisez la fonction plot pour vérifier les résidus. Est-ce que quelque chose semble problématique?*
 
 ```{r}
 plot(barley1)
 ```
 
-*Question 6: Use the emmeans() function to obtain the estimated means and confidence intervals for each genotype. Then pipe this into the cld() function to conduct the mean seperation analysis*
+*Question 6: Utilisez la fonction emmeans() pour obtenir les moyennes estimées et les intervalles de confiance pour chaque génotype. Puis dirigez-le dans la fonction cld() pour effectuer l'analyse de séparation moyenne*
 
 ```{r}
 emmeans(barley1,~gen)
@@ -81,19 +81,19 @@ emmeans(barley1,~gen) %>%
 
 ## Exercise 2
 
-When we completed exercise 1 we assumed all points were independent and the layout factors were not relevant. Let's investigate this further.
+*Lorsque nous avons terminé l'exercice 1, nous avons supposé que tous les points étaient indépendants et que les facteurs de mise en page n'étaient pas pertinents. Examinons cela plus en détail.
 
-*Question 1 : Using the `tabyl` function produce two tables to show the frequencies of how many times each genotype appears in each row (table 1) and each column (table 2)*
+* Question 1: En utilisant la fonction `tabyl`, produisez deux tableaux pour montrer les fréquences de combien de fois chaque génotype apparaît dans chaque ligne (tableau 1) et chaque colonne (tableau 2)*
 
 ```{r}
 tabyl(beaven.barley,gen,row)
 tabyl(beaven.barley,gen,col)
 ```
 
-You should see that each genotype appears 4 times per row. Not all genotypes appear in all columns but there is clearly an attempt to make a balanced design.
+Vous devriez voir que chaque génotype apparaît 4 fois par ligne. Tous les génotypes n'apparaissent pas dans toutes les colonnes, mais il y a clairement une tentative de faire une conception équilibrée.
 
-*Question 2: Make two boxplots showing the yield distributions in each row (1) and then in each column (2).What do you notice?*
-Hint - the warning message you may see is trying to help you! Pay attention to what it says.
+*Question 2: Faites deux boîtes à moustaches montrant les distributions de rendement dans chaque ligne(1) puis dans chaque colonne(2). Que remarquez-vous?*
+Astuce - le message d'avertissement que vous pouvez voir essaie de vous aider! Faites attention à ce qu'il dit.
 ```{r}
 ggplot(data=beaven.barley,aes(y=yield,x=row,group=row))+
   geom_boxplot()
@@ -103,14 +103,14 @@ ggplot(data=beaven.barley,aes(y=yield,x=col,group=col))+
 
 ```
 
-*Question 3: Let's now fit a model using lmer() and save it an object called barley2. The random effects for this row column layout should be specified as one random effect for row, and one for column. So the random part of the model code should look like "(1|row)+(1|col)"*
+*Question 3: Ajustez maintenant un modèle en utilisant lmer() et enregistrez-le un objet appelé barley2. Les effets aléatoires pour cette disposition de colonne de ligne doivent être spécifiés comme un effet aléatoire pour la ligne et un pour la colonne. Ainsi, la partie aléatoire du code du modèle devrait ressembler à "(1|row)+(1|col)"*
 
 
 ```{r}
 barley2<-lmer(yield~gen+(1|row)+(1|col),data=beaven.barley)
 ```
 
-*Question 4: Use the summary(), anova(), plot() and also the r.squaredGLMM() to investigate this model, and compare it to the results from exercise 1. What do you notice? Can you explain the differences?*
+*Question 4: Utilisez le summary(), anova(), plot() ainsi que r.squaredGLMM() pour étudier ce modèle et comparez-le aux résultats de l'exercice 1. Que remarquez-vous? Pouvez-vous expliquer les différences?*
 
 ```{r}
 summary(barley2)
@@ -129,7 +129,8 @@ plot(barley2)
 ```
 
 
-*Question 5: Carry out the mean separation analysis on the new model, to obtain adjusted means, confidence intervals, and the letter display. Compare again to the results from exercise 1 - what do you notice?* 
+*Question 5: Effectuer l'analyse de séparation moyenne sur le nouveau modèle, pour obtenir les moyennes ajustées, les intervalles de confiance et l'affichage des lettres. Comparez à nouveau avec les résultats de l'exercice 1 - que remarquez-vous?*
+
 ```{r}
 emmeans(barleymod2,~gen) %>%
   cld()
@@ -137,13 +138,13 @@ emmeans(barleymod2,~gen) %>%
 
 ## Exercise 3
 
-Now let's go back to the fallow data from the tutorial
+Revenons maintenant aux données de jachère du tutoriel
 
 ```{r}
 fallow <- read.csv("Fallow N2.csv")
 ```
 
-Conduct an analysis of how the striga count varies across the different fallow treatments. Pick what you thing is a sensible model, and come to some conclusions about how striga varies by treatment. Pay close attention to the model checking plots! There may be some problems where you might wish to make some transformations to your striga variable!
+Effectuer une analyse de la façon dont le nombre de striga varie selon les différents traitements de jachère. Choisissez ce que vous pensez être un modèle sensé et tirez des conclusions sur la façon dont le striga varie selon le traitement. Faites très attention au modèle de vérification des parcelles! Il peut y avoir des problèmes où vous voudrez peut-être faire des transformations à votre variable striga!
 
 
 

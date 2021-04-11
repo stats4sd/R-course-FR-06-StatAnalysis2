@@ -13,7 +13,7 @@
 <meta name="progressive" content="true" />
 <meta name="allow-skip" content="true" />
 
-<title>Statistical Models in R</title>
+<title>Modélisation statistique avec R</title>
 
 
 <!-- highlightjs -->
@@ -118,29 +118,27 @@ $(document).ready(function () {
 
 <div id="section-introduction" class="section level2">
 <h2>Introduction</h2>
-<p>Within this tutorial we will look at a few common statistical modelling approaches often used in agricultural analysis:</p>
+<p>Dans ce tutoriel, nous allons voir comment utiliser certains des modéles statistique les plus couramment utilisés, notamment lorsqu’il s’agit d’analyser des donnees issues de recherches en agriculture. Nous allons parler de :</p>
 <ol style="list-style-type: decimal">
-<li>A linear regression model</li>
-<li>An Analysis of Variance (ANOVA) model.</li>
-<li>Extending the ANOVA model to a generalized linear model</li>
+<li>Modèle de régression linéaire</li>
+<li>Modèle d’analyse de variance (ANOVA).</li>
+<li>Modèles linéaires mixtes et généralisés.</li>
 </ol>
-<p>You will quickly see that the code required in R for all of these modelling approaches is very similar. In fact all of these models are all part of the same general modelling framework - this extends to nearly all of the common models that you could ever want to fit.</p>
+<p>Vous constaterez rapidement que le code requis dans R pour toutes ces approches de modélisation est très similaire. En fait, tous ces modèles font partie du même cadre général de modélisation, qui s’étend à presque tous les modèles courants que vous pourriez vouloir ajuster.</p>
 <p><img src="https://youtu.be/AYLY10wk6PY" /></p>
-<p>In the video above I explain more generally about models, beyond just the simple straight line linear regression model. The simple straight line linear regression model is nice, and has lots of useful applications.</p>
-<p>But in many cases won’t be sufficient to build a comprehensive model to understand our questions and data in full. Although the statistics underlying more advanced methodologies can start to become increasingly complicated, the R code to produce these models does not increase in complexity to anywhere near the same extent! This means that with R we should be able to learn how to analyse our data according to our objectives, rather than trying to use approaches simply because we have already been taught about them or because they are ‘easy’.</p>
-<p>It is important to match our questions, and our data, to the model that we are using. A model is useless if it does not let us answer the questions we have, or if it is not appropriate for the data that we have. So do not be limited by only using models you ‘know’ or have been taught about - try to find the right sort of model for you. If you are stuck with this process, reach out to someone to ask them for help in giving you advice! But the nice thing is, that using R means that actually fitting this model may be very straightforward indeed once you know what you are looking for.</p>
+<p>Dans la vidéo ci-dessus, j’explique plus généralement ce que l’on entend par modèle et explique l’interet d’aller au-delà du simple modèle de régression linéaire. Car dans de nombreux cas, celui-ci n’est pas suffisant pour avoir un modèle qui explique bien nos données et permette de repondre aux questions que l’on se pose. Mais bien que la theorie statistique devient en general de plus en plus compliquées a mesure que les modeles deviennent plus complexes, le code R permettant de spécifier et étudier ces modèles complexes, lui, n’est en fait pas beaucoup plus compliqué que pour les modeles simples. Cela signifie qu’avec R, nous devrions pouvoir apprendre à analyser nos données, sans avoir a nous restraindre sur les modeles que nous pouvons utiliser. Nous devrions pouvoir utiliser le modele qui <strong><em>convient</em></strong> a nos objectifs et nos données.</p>
 </div>
-<div id="section-data" class="section level2">
-<h2>Data</h2>
-<p>The data used in this example is from a study was conducted in Eastern Zambia with the main objective of improving the efficiency of the natural fallows by using appropriate trees that may have relevance in soil fertility regeneration within permissible fallow periods.</p>
-<p>The data has been read into R and assigned to an object called <code>fallow</code>.</p>
-<p>The design was a RCBD experiment (randomised complete block design) with 4 blocks and 9 treatments. If you take a look at the data below you will see that we have data concerning the measurement of the yield (the column <code>yield</code> within the data) and the striga count (<code>striga</code>) of a plot (the column <code>plot</code>), within a block (the column <code>rep</code>), after a specific treatment (the column <code>treat</code>).</p>
-<div id="htmlwidget-40be17da6247b3ce2d6a" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-40be17da6247b3ce2d6a">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36"],[1,4,4,1,1,3,3,1,3,2,2,4,2,1,3,2,3,4,3,3,3,2,1,4,4,2,2,1,2,4,4,1,2,3,1,4],[2,3,6,9,7,3,8,6,9,9,5,5,3,8,5,6,4,8,6,1,2,7,4,7,1,8,2,3,4,9,4,1,1,7,5,2],["8 maize","5 C.siamea","8 maize","7 groundnut","5 C.siamea","8 maize","5 C.siamea","9 nat fallow","6 C.calo","5 C.siamea","6 C.calo","6 C.calo","8 maize","6 C.calo","9 nat fallow","9 nat fallow","7 groundnut","9 nat fallow","4 F.congesta","2 G.sepium","3 L.leuco","4 F.congesta","3 L.leuco","4 F.congesta","7 groundnut","3 L.leuco","7 groundnut","4 F.congesta","2 G.sepium","2 G.sepium","3 L.leuco","2 G.sepium","1 S.sesban","1 S.sesban","1 S.sesban","1 S.sesban"],[1.14,1.74,1.95,2.06,2.09,2.15,2.21,2.22,2.34,2.38,2.62,2.65,2.66,2.74,2.9,3,3.03,3.12,3.16,3.19,3.39,3.45,3.48,3.48,3.52,3.62,3.72,3.75,3.85,3.95,4.21,4.39,4.72,5.29,5.64,6.54],[2798,0,1787,129,1,1144,0,228,0,0,0,105,400,71,0,203,120,89,1,1371,0,49,0,1741,270,0,1,1,721,755,41,1,0,1,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>rep<\/th>\n      <th>plot<\/th>\n      <th>treat<\/th>\n      <th>yield<\/th>\n      <th>striga<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="section-données" class="section level2">
+<h2>Données</h2>
+<p>Les données utilisées dans cet exemple proviennent d’une étude menée dans l’Est de la Zambie ayant pour objectif principal d’améliorer l’efficacité des jachères naturelles en utilisant des arbres appropriés qui favorisent la régénération de la fertilité du sol dans les périodes de jachère.</p>
+<p>Les données ont été chargées dans R et assignées à un objet appelé <code>fallow</code>.</p>
+<p>Le design de l’expérience est un RCBD (design en blocs complets randomisés) avec 4 blocs et 9 traitements. Si vous regardez les données ci-dessous, vous verrez que nous avons des données concernant le rendement (la colonne <code>yield</code> dans les données) et le quantite de striga (<code>striga</code>) pour chaque parcelle (la colonne <code>plot</code> ), d’un bloc (la colonne <code>rep</code>), ayant subi un traitement spécifique (la colonne <code>trait</code>).</p>
+<div id="htmlwidget-833f1dccdf4e0a3aeb8a" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-833f1dccdf4e0a3aeb8a">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36"],[1,4,4,1,1,3,3,1,3,2,2,4,2,1,3,2,3,4,3,3,3,2,1,4,4,2,2,1,2,4,4,1,2,3,1,4],[2,3,6,9,7,3,8,6,9,9,5,5,3,8,5,6,4,8,6,1,2,7,4,7,1,8,2,3,4,9,4,1,1,7,5,2],["8 maize","5 C.siamea","8 maize","7 groundnut","5 C.siamea","8 maize","5 C.siamea","9 nat fallow","6 C.calo","5 C.siamea","6 C.calo","6 C.calo","8 maize","6 C.calo","9 nat fallow","9 nat fallow","7 groundnut","9 nat fallow","4 F.congesta","2 G.sepium","3 L.leuco","4 F.congesta","3 L.leuco","4 F.congesta","7 groundnut","3 L.leuco","7 groundnut","4 F.congesta","2 G.sepium","2 G.sepium","3 L.leuco","2 G.sepium","1 S.sesban","1 S.sesban","1 S.sesban","1 S.sesban"],[1.14,1.74,1.95,2.06,2.09,2.15,2.21,2.22,2.34,2.38,2.62,2.65,2.66,2.74,2.9,3,3.03,3.12,3.16,3.19,3.39,3.45,3.48,3.48,3.52,3.62,3.72,3.75,3.85,3.95,4.21,4.39,4.72,5.29,5.64,6.54],[2798,0,1787,129,1,1144,0,228,0,0,0,105,400,71,0,203,120,89,1,1371,0,49,0,1741,270,0,1,1,721,755,41,1,0,1,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>rep<\/th>\n      <th>plot<\/th>\n      <th>treat<\/th>\n      <th>yield<\/th>\n      <th>striga<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
-<div id="section-packages-used" class="section level2">
-<h2>Packages used</h2>
-<p>In this tutorial we will use four new packages: <code>emmeans</code>, <code>multcomp</code>, <code>lmerTest</code> and <code>MuMIn</code>; in addition we will use some of the packages we have used regularly so far in this course <code>dplyr</code> and <code>ggplot2</code>. Make sure these are all installed and loaded before running any of the code on your own computer.</p>
+<div id="section-packages-utilisés" class="section level2">
+<h2>Packages utilisés</h2>
+<p>Dans ce tutoriel, nous utiliserons quatre nouveaux packages: <code>emmeans</code>,<code>multcomp</code>, <code>lmerTest</code> et<code>MuMIn</code>; de plus, nous utiliserons certains des packages que nous avons utilisés régulièrement jusqu’à présent dans ce cours <code>dplyr</code> et<code>ggplot2</code>. Assurez-vous qu’ils sont tous installés et chargés avant d’exécuter l’un des codes sur votre propre ordinateur.</p>
 <pre><code>library(ggplot2)
 library(dplyr)
 
@@ -151,20 +149,20 @@ library(emmeans)
 library(MuMIn)
 </code></pre>
 </div>
-<div id="section-linear-regression-model" class="section level2">
-<h2>Linear regression model</h2>
-<p>The first type of model we are going to investigate is a linear regression model, exploring whether there is a relationship between <code>yield</code> and <code>striga</code> from our data.</p>
-<p>We are assuming that you have come across the topic of linear models before. Even if you have, there is a nice video from Crash Course Statistics which provides a nice refresher of the methodology. <img src="https://www.youtube.com/watch?v=WWqE7YHR4Jc" /></p>
-<p>As we learnt in the previous modules, the first thing we should do is to explore our data and look at some summary statistics and plots!</p>
-<div id="section-exploratory-data-analysis" class="section level3">
-<h3>Exploratory data analysis</h3>
-<p>When considering summary statistics there are two things we could do. Firstly we could calculate a correlation, using the <code>cor</code> function. To use this function we need to specify the two variables with which we want to calculate the correlation.</p>
+<div id="section-modèle-de-régression-linéaire" class="section level2">
+<h2>Modèle de régression linéaire</h2>
+<p>Le premier type de modèle que nous allons étudier est un modèle de régression linéaire, afin de déterminer s’il y a une relation linéaire entre <code>yield</code> et <code>striga</code>.</p>
+<p>Nous supposons que vous avez entendu parler des modèles de regression linéaire. Voila une vidéo de “Crash Course Statistics” qui peut aider a se rappeler de comment marche cette méthodologie. <img src="https://www.youtube.com/watch?v=WWqE7YHR4Jc" /></p>
+<p>Comme nous l’avons appris dans les modules précédents, la première chose à faire est d’explorer nos données et d’examiner quelques résumés statistiques et graphiques !</p>
+<div id="section-analyse-exploratoire-des-données" class="section level3">
+<h3>Analyse exploratoire des données</h3>
+<p>Pour examiner les données a partir de résumés statistiques, nous pourrions faire deux choses. Premièrement, nous pourrions calculer une corrélation, en utilisant la fonction <code>cor</code>. Pour utiliser cette fonction, nous devons spécifier les deux variables avec lesquelles nous voulons calculer la corrélation.</p>
 <div class="tutorial-exercise" data-label="cor1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>cor(fallow$yield,fallow$striga)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>A value of -0.339 suggests a small-to-moderate size negative correlation between these variables. But correlation is not an especially informative value - fitting a linear model provides us with the same, and much more, information!.</p>
-<p>We could also calculate summary statistics of yield based on categorising the striga variable and then calculating means within these groups. We could use <code>mutate</code> to create a new variable, and within <code>mutate()</code> use the <code>cut()</code> function to break <code>striga</code> into multiple groups. Using this new variable we can then <code>group_by()</code> and <code>summarise()</code> the yield values. The <code>cut</code> function requires us to set the break points for our new categories - note that the lower limit is exclusive by default, so we need to make sure we include the option <code>include.lowest=TRUE</code> to make sure the 0 striga counts are included in this group.</p>
+<p>Une valeur de -0,339 suggère une corrélation négative de force moyenne entre ces variables. Mais la corrélation n’est pas une valeur particulièrement informative - l’ajustement d’un modèle linéaire nous fournit les mêmes informations, et beaucoup d’autres choses !</p>
+<p>Nous pourrions également calculer des résumés statistiques tel que la moyenne du rendement pour différentes catégories de la variable striga. Nous pourrions utiliser <code>mutate()</code> pour créer une nouvelle variable, et dans<code>mutate()</code> utiliser la fonction<code>cut()</code>pour diviser <code>striga</code> en plusieurs groupes afin de définir nos catégories. Nous pourrons alors utiliser <code>group_by()</code> sur cette nouvelle variable, puis <code>summarise()</code> pour calculer nos moyennes de rendement. Dans la fonction <code>cut()</code> ont doit définir les valeurs qui délimitent nos nouvelles catégories - notez que la limite inférieure est exclue par défaut, nous devons donc nous assurer que nous incluons l’option<code>include.lowest = TRUE</code> pour nous assurer que la quantité de striga “0” est incluse dans la premiere catégorie</p>
 <div class="tutorial-exercise" data-label="sumstats" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>fallow %&gt;%
   mutate(striga_grp=cut(striga,breaks=c(0,25,250,9999),include.lowest = TRUE))%&gt;%
@@ -172,12 +170,12 @@ library(MuMIn)
       summarise(mean(yield),n())</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>As we move through the three categories we can see a reduction in the mean yield - from 3.6 t/ha in the lowest striga count group, to 2.88 t/ha in the highest striga count group.Exactly where to put the break points in <code>cut</code> and how many groups to choose is a little arbitrary. I chose some fairly round numbers and went with three new categories - from 0 to 25 striga counts, from 26 to 250 striga and then more than 250.</p>
+<p>Nous pouvons voir une réduction du rendement moyen - de 3,6t/ha dans le groupe ayant la plus faible quantite de striga, à 2,88t/ha dans le groupe ayant la quantite la plus élevé de striga. <code>cut</code> et le nombre de groupes à choisir est un peu arbitraire. J’ai choisi des nombres assez ronds et je suis allé parti sur trois nouvelles catégories concernant la quantite de striga - de 0 à 25, de 26 à 250, et plus de 250.</p>
 </div>
-<div id="section-plots" class="section level3">
-<h3>Plots</h3>
-<p>Let’s look at the ‘obvious’ plot when considering this sort of relationship between two continuous variables - a scatter plot of striga against yield. We will put <code>yield</code> on the y axis and <code>striga</code> on the x axis. This is because we are considering yield to be our response variable and striga to be our predictor variable. We think it is more likely that an increased striga infestation will result in reduced yields rather than the other way around (although there is some debate over this!).</p>
-<p>See if you can write the code to produce the plot below using the appropriate <code>geom</code> from <code>ggplot2</code>.</p>
+<div id="section-graphiques" class="section level3">
+<h3>Graphiques</h3>
+<p>Examinons le type graphique le plus ‘évidente’ lorsque nous considérons ce type de relation entre deux variables continues - le nuage de points de la quantite de striga par rapport au rendement. Nous mettrons <code>yield</code> (le rendement) sur l’axe des y et <code>striga</code> sur l’axe des x. En effet, nous considérons le rendement comme notre variable “réponse” et la quantite de striga comme notre variable “prédictive”. Nous pensons qu’il est plus probable qu’une infestation accrue de striga entraînera une baisse des rendements plutôt que l’inverse (bien qu’il y ait débat à ce sujet!).</p>
+<p>Voyez si vous pouvez reproduire le graphique ci-dessous en utilisant la <code>geom_</code> appropriée de<code>ggplot2</code>.</p>
 <p><img src="Index_files/figure-html/plot0-1.png" width="624" /></p>
 <div class="tutorial-exercise" data-label="plot1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
@@ -186,53 +184,53 @@ library(MuMIn)
 <pre class="text"><code>ggplot(data=fallow,aes(y=yield,x=striga))+
   geom_point()</code></pre>
 </div>
-<p>To help us understand this relationship better we can also add an additional layer using <code>geom_smooth</code> which will fit a trend line. By default this fits a ‘generalised additive model’ which is similar idea to a moving average. However, we can also use the function to provide the simple linear regression model of a straight line by using the option <code>method=lm</code>.</p>
+<p>Pour nous aider à mieux comprendre cette relation, nous pouvons ajouter une couche “geom_” supplémentaire en utilisant <code>geom_smooth</code> qui ajoutera une ligne de tendance a notre graphique. Par défaut, la courbe de tendance est calculée à partir d’un ‘modèle additif généralisé’ qui est une similaire à une moyenne mobile. Cependant, nous pouvons demander a R d’utilsier un modèle de régression linéaire simple pour calculer notre tendance sous forme d’une ligne droite, en utilisant l’option <code>method = lm</code>.</p>
 <div class="tutorial-exercise" data-label="plot2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>ggplot(data=fallow,aes(y=yield,x=striga))+
   geom_point()+
     geom_smooth(method=&quot;lm&quot;)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>It looks like a straight line is probably a reasonably sensible way of fitting the relationship here. We do have lots of points with low striga counts - but as we increase the striga count the trend in yield seems roughly linear and decreasing. While most observations have low striga counts, and among those observations the variability in yield is high, those few observations with higher striga counts all seem to have relatively low yields.</p>
+<p>On dirait qu’une ligne droite semble relativement bien adaptée a notre relation. Nous avons beaucoup de points avec un faible nombre de striga - mais à mesure que nous augmentons le nombre de striga, le rendement semble décroitre de facon à peu près linéaire. La plupart des observations ont un faible nombre de striga, et parmi ces observations, la variabilité du rendement est élevée, mais les quelques observations avec un nombre de striga plus élevé semblent toutes avoir des rendements relativement faibles.</p>
 </div>
-<div id="section-fitting-the-model" class="section level3">
-<h3>Fitting the model</h3>
-<p>To examine more about the model that we have plotted using <code>geom_smooth</code> we need to formally fit the model in R. We do this using the <code>lm()</code> command. Note the function we are using is written with the letter <code>l</code> not the number <code>1</code>. “lm” stands for “linear model”. The syntax for this is very similar to what we saw in the previous module for t-tests, with a response variable, a tilde, then the explanatory variable. Then the name of the dataset after.</p>
+<div id="section-ajuster-le-modèle" class="section level3">
+<h3>Ajuster le modèle</h3>
+<p>Pour explorer un peu plus le modèle que nous avons utilisé avec <code>geom_smooth</code>, nous devons ajuster formellement le modèle dans R. Nous le faisons en utilisant la commande<code>lm()</code>. Notez que la fonction que nous utilisons est écrite avec la lettre <code>l</code> et non le nombre <code>1</code>. “lm” signifie “linear model” (modèle linéaire). La syntaxe de la fonction <code>lm()</code> est très similaire à ce que nous avons vu dans le module précédent pour le tests t, avec une variable de réponse, le tilde, puis la variable explicative. Et puis le nom du jeu de données que l’on renseigne après.</p>
 <div class="tutorial-exercise" data-label="lm1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>lm(yield~striga,data=fallow)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>The output here only tells us two things:</p>
+<p>La sortie ici ne nous fournit que deux informations:</p>
 <ul>
-<li>“Call” - simply repeating back the model we have specified</li>
-<li>“Coefficients”: Telling us the values of the parameters</li>
+<li>“Call” - répétant simplement le modèle que nous avons spécifié</li>
+<li>“Coefficients”: nous indiquant les valeurs des paramètres</li>
 </ul>
-<p>A linear regression follows the equation of a straight line y = B0 + B1x. You may have learnt this same equation as y=a+bx or y=mx+c ; depending on where and when you went to school. There is then an additional term <span class="math inline">\(\epsilon\)</span> , which represents the residual variability in this relationship. If all the points were to sit perfectly on the line then there would be no need for an <span class="math inline">\(\epsilon\)</span> term, but in reality we always have underlying variability that needs to be accounted for.</p>
-<p>The coefficients give us the value of our intercept (B0): 3.43 and the value of our slope (B1): -0.00059</p>
-<p>So the overall model would be:</p>
-<p>yield = 3.43 - 0.00059 * striga count + <span class="math inline">\(\epsilon\)</span></p>
-<p>The value of the intercept is interpreted as the expected value of the response variable where all explanatory variables are equal to zero. So for a plot with no striga, we would expect to see an average yield of 3.43 t/ha.</p>
-<p>The value of the slope represents the change we expect to see in the response variable for a one unit increase in the explanatory variable. So for additional striga observed, we expect an average reduction in the yield of 0.00059 t/ha.</p>
-<p>The output at this stage has not told us anything about the error term, <span class="math inline">\(\epsilon\)</span>.</p>
-<p>However we can get much more information from our model than this! R is a little different from many other software packages, which will produce a lot of different outputs when you create a model. In R you have to ask specifically for what you want out of a model.</p>
-<p>But first we usually need to save the model to an object. I am choosing to give it the name <code>linreg_mod</code>.</p>
+<p>Une régression linéaire suit l’équation d’une ligne droite y = B0 + B1x. Vous avez peut-être appris cette même équation par y = a + bx ou y = mx + c; selon l’endroit et le moment où vous avez étudié cela. En statistique, on ajoute aussi un terme supplémentaire <span class="math inline">\(\epsilon\)</span>, qui représente la variabilité résiduelle de cette relation. Si tous les points se trouvaient parfaitement sur la ligne, alors il n’y aurait pas besoin du terme <span class="math inline">\(\epsilon\)</span>, mais en réalité, nous avons toujours une variabilité qui doit être prise en compte.</p>
+<p>Les coefficients que R nous donnent sont l’ordonnée à l’origine (B0): 3,43, et la valeur de notre coefficient directeur ou pente (B1): -0,00059</p>
+<p>Notre modèle de regression lineaire serait donc:</p>
+<p>rendement = 3,43 - 0,00059 * nombre de striga + <span class="math inline">\(\epsilon\)</span></p>
+<p>La valeur de l’ordonnée à l’origine est interprétée comme la valeur moyenne attendue de la variable réponse lorsque toutes les variables explicatives sont égales à zéro. Donc, pour une parcelle sans striga, on s’attend à voir un rendement moyen de 3,43 t/ha.</p>
+<p>La valeur de la pente représente le changement que nous nous attendons à voir dans la variable réponse lorsque il y a une augmentation d’une unité de la variable explicative. Ainsi, pour chaque striga supplémentaire observée, il semble en moyenne y avoir une réduction du rendement de 0,00059 t/ha.</p>
+<p>Pour l’instant, le resultat de la fonction <code>lm()</code> ne nous a rien dit sur le terme d’erreur, <span class="math inline">\(\epsilon\)</span>.</p>
+<p>Cependant, nous pouvons obtenir beaucoup plus d’informations a propos de notre modèle ! R est un peu différent de nombreux autres logiciels qui produisent de nombreux tableaux différents lorsque vous créez un modèle. Dans R, vous devez demander spécifiquement ce que vous voulez que R vous affiche a propos de votre modèle.</p>
+<p>C’est ce que nous allons faire, mais avant ca, nous devons sauver l’ajustement de notre modèle dans un objet. Je choisis de lui donner le nom <code>linreg_mod</code>.</p>
 <div class="tutorial-exercise" data-label="lm2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>linreg_mod&lt;-lm(yield~striga,data=fallow)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
 </div>
-<div id="section-summarising-the-model" class="section level3">
-<h3>Summarising the model</h3>
-<p><code>summary()</code> provides us with a lot of useful information in a customised output format containing model fit statistics, standard errors and p-values for the coefficients.</p>
+<div id="section-résumé-de-lajustement-du-modèle" class="section level3">
+<h3>Résumé de l’ajustement du modèle</h3>
+<p><code>summary()</code> nous fournit de nombreuses informations statistiques utiles concernant l’ajustement de notre modèle, notamment les ecarts-types et p-values associees aux coefficients.</p>
 <div class="tutorial-exercise" data-label="lm2s" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>summary(linreg_mod)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>One of the outputs from <code>summary()</code> allows us to complete the full linear regression model, as it provides the value of sigma, also known as the residual standard error. Within our error term, <span class="math inline">\(\epsilon\)</span>, this is the standard deviation of the residual values. Because we are doing a simple linear model we assume our residuals are normally distributed with a mean of 0. We will check if that assumption makes sense in a short while.</p>
-<p>Overall the information tells us that the relationship between striga count and yield is significant, p=0.043.</p>
-<p>The intercept is also significant. But this is almost certainly not of interest. The null hypothesis which generates this p-value is that the intercept is equal to 0. In other words the null hypothesis is that the expected yield value when there is no striga is 0 t/ha. It is not really surprising to see very strong evidence against this nonsensical null hypothesis!</p>
-<p>If we look back at the output of <code>summary()</code> we can also see that 11.5% of the variability in yield can be explained by the linear increase in striga (Multiple R- Squared / r.squared). You can read a little bit about r-squared, and why the adjusted r-squared is also a useful metric to consider <a href="https://thestatsgeek.com/2013/10/28/r-squared-and-adjusted-r-squared/">here</a>.</p>
-<p>Like with the <code>t.test</code> function, the data argument comes after the formula. So if we were to use a pipe from data into <code>lm()</code> we would need to specify <code>data=.</code> within the <code>lm</code> function. However - we can pipe <em>out</em> of the model into the later functions, which can be pretty useful. Although we do often want to save the model objects rather than use pipes, because computing the model can take a little bit of time if we have a large dataset or a complicated model. And we often want to do lots of different things with our model, rather than a continuous pipe so if we use pipes the whole way the model has to be recomputed every time we run the code. If we store an object it would run much faster.</p>
+<p>L’un des resultats fourni par <code>summary ()</code> nous permet de compléter le modèle de régression linéaire, car il fournit la valeur de sigma, également connue sous le nom d’erreur standard résiduelle. Dans notre terme d’erreur, <span class="math inline">\(\epsilon\)</span>, il s’agit de l’écart type des valeurs résiduelles. Parce que nous faisons un modèle linéaire simple, nous supposons que nos résidus sont normalement distribués avec une moyenne de 0. Nous vérifierons bientot si cette hypothèse semble valide.</p>
+<p>Les resultats nous indiquent que la relation entre le nombre de striga et le rendement semble statistiquement significative, p = 0,043.</p>
+<p>L’ordonnée à l’origine est également associee a une p-value significative. Mais cela n’a que peu d’intérêt. L’hypothèse nulle qui génère cette p-value est que l’ordonnée à l’origine est égale à 0. En d’autres termes, l’hypothèse nulle est que la valeur de rendement attendue en l’absence de striga est de 0 t/ha. Il n’est pas vraiment surprenant que les donnees nous indiquent que ce n’est certainement pas le cas !</p>
+<p>Si nous regardons de nouveau le resultat de la fonction <code>summary()</code>, nous pouvons également voir que 11,5% de la variabilité du rendement peut être expliquée par la relation lineaire avec la quantite de striga (Multiple R-Squared / r.squared). Vous pouvez lire un peu plus sur le r-carré, et pourquoi le r-carré ajusté est également une métrique utile à considérer <a href="https://thestatsgeek.com/2013/10/28/r-squared-and-adjusted-r-squared/">ici</a>.</p>
+<p>Comme avec la fonction <code>t.test</code>, l’argument data vient après la formule. Donc, si nous voulions utiliser un “pipe” <code>%&gt;%</code> avec <code>lm()</code> nous aurions besoin de spécifier <code>data=.</code> dans la fonction <code>lm()</code>. Une chose qui est assez pratique est nous pouvons aussi utiliser le pipe <em>apres</em> l’ajustement du modèle, vers d’autres fonctions. En general, nous voulons cependant plutot enregistrer l’ajustement de nos modèles plutôt que d’utiliser des pipes, parce que le calcul du modèle peut prendre un peu de temps si nous avons un jeu de données volumineux ou un modèle compliqué. Et nous voulons souvent faire plusieurs choses différentes avec notre ajustement. Mais cela reste utile de savoir que l’on peut utiliser l’operateur pipe ici aussi :</p>
 <div class="tutorial-exercise" data-label="lmpipe" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>fallow %&gt;%
   lm(yield~striga,data=.) %&gt;%
@@ -240,27 +238,31 @@ library(MuMIn)
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
 </div>
-<div id="section-checking-model" class="section level3">
-<h3>Checking Model</h3>
-<p>We should also check our residual plots to assess model validity. It is worth recapping, or learning how to interpret these plots, as it can take some practice to know what you are looking for. “Statistics by Jim” has a nice overview: <a href="https://statisticsbyjim.com/regression/ols-linear-regression-assumptions/" class="uri">https://statisticsbyjim.com/regression/ols-linear-regression-assumptions/</a></p>
+<div id="section-vérification-du-modèle" class="section level3">
+<h3>Vérification du modèle</h3>
+<p>Nous devrions également vérifier nos graphiques résiduels pour évaluer la validité du modèle. Cela vaut la peine de récapituler ou d’apprendre à interpréter ces graphiques, car cela peut prendre un peu de pratique pour savoir les analyser. “Statistics by Jim” a un article utile pour cela: <a href="https://statisticsbyjim.com/regression/ols-linear-regression-assumptions/" class="uri">https://statisticsbyjim.com/regression/ols-linear-regression-assumptions/</a></p>
 <div class="tutorial-exercise" data-label="chkplot" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>plot(linreg_mod)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>These plots allow us to check a number of different key assumptions related to the linearity of the trend (is there any pattern in the residuals vs. fitted plot?); the homogeneity of variance (is there any pattern in the scale location plot); the approximate normality of the residuals (do the points in the Normal QQ plot roughly follow the line); and the existence of outlying or high leverage points (are any standardised residuals &gt;3 or are any points outisde the funnel in the residuals vs leverage plot).</p>
-<p>In this case all four of those checks seem to be satisfactory.</p>
-<p>However - there is a much more important consideration which cannot be assessed from these plots - are my points all independent? In this case the answer is certainly “No” which does make the model not valid. This is because when we are producing the model here we have completely ignored the structure of the experiment - we have not considered the different treatments (which will form one source of dependence) and we have not considered the blocks used in this experiment (which will form another source of dependence).</p>
-<p>So the model we have produced is not going to be especially valid for a comparison of yield and striga counts! In the exercise we will look at improving this model. But the code we have used will be useful for when you do have to produce linear regressions!</p>
+<p>Ces graphiques nous permettent de vérifier un certain nombre de conditions de validité clés liées à<br />
+* la linéarité de la tendance (y a-t-il une tendance entre les valeurs résiduelles et le graphique ajusté? Si oui, alors la lien entre nos variables n’est peut-etre pas lineaire);<br />
+* l’homogénéité de la variance (y a-t-il une tendance visible dans le graphique “scale-location”?);<br />
+* la normalité approximative des résidus (les points du graphique “normal QQ” suivent-ils approximativement une ligne droite);<br />
+* et l’existence de points extremes ayant une grosse influence (existe-t-il des résidus normalisés &gt;3 ou des points situés hors de l’entonnoir dans le graphique “résidus vs leverage”).</p>
+<p>Dans notre cas, les quatre graphiques semblent satisfaisants.</p>
+<p>Cependant, il y a une condition de validité tres importante qui ne peut être évaluée à partir de ces graphiques : mes points sont-ils tous indépendants ? Dans notre cas, la réponse est certainement “non”, ce qui rend le modèle non valide. En effet, lorsque nous avons choisi notre modèle ici, nous avons complètement ignoré la structure de l’expérience - nous n’avons pas pris en compte les différents traitements (qui constituent une source de dépendance) et nous n’avons pas pris en compte les blocs utilisés dans cette expérience (qui constituent une autre source de dépendance).</p>
+<p>Ainsi, le modèle que nous avons utilisé ici n’est probablement pas valable pour comparer les rendements et la quantite de strigas. Dans l’exercice, nous allons chercher à améliorer ce modèle. Mais le code que nous avons utilisé dans cette partie sera tout a fait correcte et vous pourrez l’utiliser pour d’autres situations ou vous voudrez effectuer une régression linéaire.</p>
 </div>
 </div>
-<div id="section-analysis-of-variance" class="section level2">
-<h2>Analysis of Variance</h2>
-<p>Simple linear regression can be used when we have a continuous outcome variable (like <code>yield</code>) and a continuous predictor variable (like <code>striga</code>). Often when being taught about statistics we are then taught separately about Analysis of Variance (ANOVA), when we have a continuous outcome variable and a categorical predictor variable, as if this was a completely different method. However, mathematically, theoretically and in terms of how R treats them, these are both identical methods. There is a nice explanation of this <a href="https://www.theanalysisfactor.com/why-anova-and-linear-regression-are-the-same-analysis/">here</a>.</p>
-<p>Both of these methods are examples of ‘general linear models’, and to fit an ANOVA model we use nearly all the same functions as we used in the previous section. We will use some more functions to explore our model results this time, and these will use some additional packages to help make interpretations across the groups. We will use the <code>emmeans</code> and <code>multcomp</code> packages to estimate marginal means and then conduct a mean separation analysis.</p>
-<p>So lets begin and conduct a one-way analysis of variance to compare whether there is any evidence of differences in average yield across the different treatment groups.</p>
+<div id="section-analyse-de-la-variance" class="section level2">
+<h2>Analyse de la Variance</h2>
+<p>Une régression linéaire simple peut être utilisée lorsque nous avons une variable réponse quantitative (comme <code>yield</code>) et une variable prédictive quantitative (comme <code>striga</code>). Souvent, lorsqu’on etudie les statistiques, on nous enseigne l’analyse de la variance (ANOVA) séparément, lorsque nous avons une variable de réponse quantitative et une variable prédictive catégorielle, Cependant, mathématiquement, théoriquement et en termes de traitement avec R, ce sont deux méthodes identiques. Il y a une belle explication à cela <a href="https://www.theanalysisfactor.com/why-anova-and-linear-regression-are-the-same-analysis/">ici</a>.</p>
+<p>Ces deux méthodes sont des exemples de ‘modèles linéaires’ (ou GLM, pour general linear model), et pour ajuster un modèle ANOVA, nous utilisons presque toutes les mêmes fonctions que celles utilisées dans la section précédente. Nous utiliserons quelques autres fonctions pour explorer les résultats de notre modèle cependant, et celles-ci utiliseront des packages supplémentaires pour nous aider à faire des interprétations sur les differences entre les categories. Nous utiliserons les packages <code>emmeans</code> et <code>multcomp</code> pour estimer les moyennes marginales, puis effectuer une analyse “mean separation” (separation de la moyenne).</p>
+<p>Commençons donc et effectuons une ANOVA a un facteur (one-way ANOVA) pour comparer s’il existe des différences de rendement entre les différents traitements.</p>
 <div id="section-summary-statistics" class="section level3">
 <h3>Summary Statistics</h3>
-<p>When we have a grouping factor like <code>treat</code> the summary statistics and plots we might want to make are very similar to what we have been doing so far. Try to replicate the table below showing the mean and standard deviation of yield by treatment.</p>
+<p>Lorsque nous avons un facteur definissant des groupes comme <code>treat</code> (traitement), les résumés statistiques et les graphiques que nous pourrions vouloir créer sont très similaires à ce que nous avons fait dans les autres tutoriel. Essayez de reproduire le tableau ci-dessous montrant la moyenne et l’écart type du rendement pour chaque traitement.</p>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["treat"],"name":[1],"type":["chr"],"align":["left"]},{"label":["mean(yield)"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["sd(yield)"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"1 S.sesban","2":"5.5475","3":"0.7625997"},{"1":"2 G.sepium","2":"3.8450","3":"0.4956813"},{"1":"3 L.leuco","2":"3.6750","3":"0.3690077"},{"1":"4 F.congesta","2":"3.4600","3":"0.2412468"},{"1":"5 C.siamea","2":"2.1050","3":"0.2708628"},{"1":"6 C.calo","2":"2.5875","3":"0.1726992"},{"1":"7 groundnut","2":"3.0825","3":"0.7407372"},{"1":"8 maize","2":"1.9750","3":"0.6318491"},{"1":"9 nat fallow","2":"2.8100","3":"0.4034848"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -275,77 +277,78 @@ library(MuMIn)
     summarise(mean(yield),sd(yield))</code></pre>
 </div>
 </div>
-<div id="section-summary-plots" class="section level3">
-<h3>Summary plots</h3>
-<p>Given we only have four observations per treatment it may not be appropriate to use a boxplot here as the number of observations per group is very small. So in this case plotting using a point geometry may be a better way of visualising the data</p>
+<div id="section-résumés-graphiques" class="section level3">
+<h3>Résumés graphiques</h3>
+<p>Étant donné que nous n’avons que quatre observations par traitement, il n’est peut être pas approprié d’utiliser des boîte à moustaches, car le nombre d’observations par groupe est très faible. Effectuer un graphique en nuage de points à l’aide d’une géométrie ‘point’ est probablement un meilleur moyen de visualiser les données</p>
 <div class="tutorial-exercise" data-label="points" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>ggplot(fallow,aes(y=yield,x=treat))+
   geom_point()</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>Both the summary statistics and the plot above shows us pretty clearly that treatment “1 S.sesban” provides higher yields than the other treatments. The lowest yield for this treatment is still higher than any of the yields from any of the other treatments. Among the other 8 treatments we also see some which are performing less well - such as the treatments “5 C.siamea” and “8 maize” which have consistently low yields.</p>
+<p>Les résumés statistiques et graphique ci-dessus nous montrent assez clairement que le traitement “1 S.sesban” fournit des rendements plus élevés que les autres traitements. Le rendement le plus bas pour ce traitement est toujours supérieur à celui de n’importe lequel des rendements de n’importe lequel des autres traitements. Parmi les 8 autres traitements, nous voyons également certains qui semblent moins bons - comme les traitements “5 C.siamea” et “8 maize” qui ont des rendements systématiquement faibles.</p>
 </div>
-<div id="section-specify-a-model-for-data" class="section level3">
-<h3>Specify a model for data</h3>
-<p>The syntax and function for creating an ANOVA model is identical to a regression model. The only difference is that the predictor variable must be a categorical variable (like <code>treat</code>) rather than a continuous variable (like <code>striga</code>). So - lets use the same <code>lm()</code> function. Like before when we run this by itself we don’t get too much useful output.</p>
+<div id="section-spécifier-un-modèle-pour-les-données" class="section level3">
+<h3>Spécifier un modèle pour les données</h3>
+<p>La syntaxe et la fonction pour spécifier et ajuster un modèle ANOVA sont identiques à celles d’un modèle de régression linéaire. La seule différence est que la variable prédictive est une variable catégorielle (comme <code>treat</code>) plutôt qu’une variable quantitative (comme <code>striga</code>). Donc - utilisons la même fonction <code>lm()</code>. Comme avant, lorsque nous l’exécutons seul, nous n’obtenons pas beaucoup de résultats utiles.</p>
 <div class="tutorial-exercise" data-label="anova_1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>lm(yield~treat,data=fallow)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>So, exactly as in the previous section, we nearly always want to assign this to an object and then use various functions to investigate the model further.</p>
+<p>Ainsi, exactement comme dans la section précédente, nous souhaitons presque toujours sauver l’ajustement de notre modele dans un objet, puis utiliser diverses fonctions sur cet objet pour en savoir plus sur notre modèle.</p>
 <div class="tutorial-exercise" data-label="anova_mod" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>anova_mod&lt;-lm(yield~treat,data=fallow)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<code>summary()</code> again provides us with the model summary information
+<code>summary()</code> est toujours une des fonctions importantes a utiliser, car elle nous fournit de nombreuses in information
 <div class="tutorial-exercise" data-label="anova_summary" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>summary(anova_mod)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>The output looks a little different to the simple linear regression output. Many things are the same, and have the same interpretation. The R square value (84.9%) and residual standard error (0.4984) are in the same positions and have the same interpretations as before.</p>
-<p>However we now have a lot more coefficients - and these have a slightly different meaning when considering a categorical variable in an ANOVA model. These coefficients represent the difference between the mean values in each treatment and the mean value of the reference level. The reference level, by default, is the first level of our categorical variable when sorted alphabetically - in this case treatment “1 S.sesban”. The intercept value represents the mean value within this reference level.</p>
-<p>Therefore the p-values shown in the summary output represent significance tests of hypotheses we may not be directly interested in. The test for the intercept is testing the hypothesis that the mean value of treatment 1 is 0. This is probably not a useful hypothesis. The tests for each of the coefficients are comparing whether each treatment is significantly different from treatment 1. This is somewhat useful, but it only tells us about the treatments in relation to the reference level. It cannot tell us about say, treatment 2 vs treatment 7, and it cannot tell us whether there is an overall effect of treatment. Although in this case the answer to that should be pretty clear!</p>
-<p>This is why we also often see an ANOVA table to show whether there is an overall effect of a categorical variable. The null hypothesis in this ANOVA table is that all of the treatments have the same mean yield. If it is a significant p-value then this suggests that at least one of the treatments has a different mean yield from the others. We can access the ANOVA table for a model by using the <code>anova()</code> function.</p>
+<p>La sortie est un tout petit peu différente de la sortie de notre régression linéaire simple. Beaucoup de choses sont identiques et ont la même interprétation. La valeur du R carré (84,9%) et l’ecart-type résiduel (0,4984) se trouvent aux mêmes endroits et ont les mêmes interprétations qu’auparavant.</p>
+<p>Cependant, nous avons maintenant beaucoup plus de coefficients - et ceux-ci ont une signification légèrement différente lorsque l’on considère une variable catégorielle dans un modèle ANOVA. Ces coefficients représentent la différence entre les valeurs moyennes de chaque traitement et la valeur moyenne du niveau de référence. Le niveau de référence, par défaut, est le premier niveau de notre variable catégorielle lorsqu’il est trié par ordre alphabétique - dans ce cas, le traitement “1 S.sesban”. L’ordonnée a l’origine (Intercept) représente la valeur moyenne dans cette categorie de référence.</p>
+<p>Par conséquent, les p-values indiquées dans le résultat de <code>summary()</code> représentent des tests de significativité concernant des hypothèses qui ne nous intéressent peut-être pas directement. Le test pour l’ordonnée a l’origine teste l’hypothèse que la valeur moyenne du traitement 1 est 0. Ce n’est probablement pas une hypothèse utile. Les tests pour chacun des autres coefficients nous indiquent si chaque traitement est significativement différent du traitement 1. Ceci est utile, mais cela ne nous renseigne que sur les traitements par rapport a la categorie de référence. Il ne peut pas nous dire, par exemple, ce qu’il en est du traitement 2 par rapport au traitement 7, et il ne peut pas nous dire s’il existe un effet global du traitement. Bien que dans ce cas, la réponse à cela devrait être assez claire !</p>
+<p>C’est pourquoi il est courant d’avoir recourt a un tableau ANOVA (analyse de variance) pour montrer s’il y a un effet global d’une variable catégorielle. L’hypothèse nulle dans ce tableau ANOVA est que tous les traitements ont le même rendement moyen. Une p-value significative, suggère donc qu’au moins un des traitements a un rendement moyen différent des autres. Nous pouvons accéder à au tableau ANOVA d’un modèle en utilisant la fonction <code>anova()</code>.</p>
 <div class="tutorial-exercise" data-label="anova_tab" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>anova(anova_mod)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>Unsurprisingly this tells us that we have an overall significant treatment effect p = 3.144e-09. Remember that this is in scientific notation; another way of writing this number would be 0.000000003144</p>
+<p>Sans surprise, cela nous indique que nous avons un effet de traitement global significatif p = 3,144e-09. N’oubliez pas que c’est en notation scientifique; une autre façon d’écrire ce nombre serait 0.000000003144. Notez aussi que nous avions aussi cette p-value tout en bas de la sortie donnee par la fonction <code>summary()</code>.</p>
 </div>
-<div id="section-checking-assumptions" class="section level3">
-<h3>Checking Assumptions</h3>
-<p>We have all of the same assumptions to check as when we ran the linear regression earlier, and we can assess the model checking plots using <code>plot()</code>. The only difference is that we are no longer checking for linearity, since we have 9 separate groups rather than a linear trend. But otherwise we still want to check if there are issues with heterogeneity, high leverage values, outliers and if there are severe violations of normality.</p>
+<div id="section-conditions-de-validité" class="section level3">
+<h3>Conditions de validité</h3>
+<p>Nous avons toutes les mêmes conditions à vérifier que lorsque nous avons exécuté la régression linéaire plus tôt, et nous pouvons aussi évaluer le modèle en vérifiant les graphiques produits par la fonction <code>plot()</code>. La seule différence est que nous ne vérifions plus la linéarité, puisque nous avons 9 groupes distincts sans ordre apparent plutôt qu’une variable quantitative dont les valeurs sont clairement ordonnées. Mais sinon, nous voulons toujours vérifier s’il y a des problèmes d’hétérogénéité de variance, des valeurs aberrantes, des valeurs qui influencent beaucoup notre modele, et s’il y a de graves violations de la normalité des résidus.</p>
 <div class="tutorial-exercise" data-label="chks2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>plot(anova_mod)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>Again - there are no clear violations of the assumptions being shown. However, as with the linear model, we may consider the possibility that we have a violation of the independence assumption. This would depend on exactly how the trial was designed:</p>
-<p>If we had one large field and each of the 36 plots was allocated randomly to the 9 treatments, a completely randomised design, then there would be no violation of independence; all of the plots would come from the same population.</p>
-<p>If we had 4 ‘blocks’ in different places across our station, and each block had one plot for each treatment, a completely randomised block design, then we would have a violation of independence. Since there would be four physical ‘blocks’ - we may expect plots in Block 1 to be similar to each other, and different to plots in Block 2. Whether or not this is likely to be an issue may depend on how variable the conditions are across the different blocks.</p>
-<p>If we had 4 farmers, and each farmer plotted each treatment once, this is definitely a violation of the independence assumption. We cannot consider farmers to be replicates!</p>
-<p>In the next section we will introduce generalised linear models to show you how to extend the models to allow for this.</p>
+<p>Encore une fois - il ne semble pas y avoir de gros problemes de validité. Cependant, comme avec la regession linéaire simple, nous pouvons envisager la possibilité que nous ayons une violation de la condition d’indépendance de nos observations. Cela dépend de la manière dont l’essai a été conçu:</p>
+<p>Si nous avions un grand champ et que chacune des 36 parcelles était allouée aléatoirement aux 9 traitements, c’est a dire si nous sommes en présence d’un plan complètement aléatoire, alors il n’y a aucune raison de penser que la condition d’indépendance n’est pas respectée; toutes les parcelles proviennent alors de la même ‘population’.</p>
+<p>Par contre, si nous avions 4 ‘blocs’ situés à différents endroits de notre station, et que chaque bloc avait une parcelle pour chaque traitement, un design experimental en blocs randomisés (Randomized Complete Block), alors nous aurions une violation de l’indépendance, puisqu’il y aurait quatre ‘blocs’ physiques pour lesquels nous pouvons nous attendre à ce que les parcelles a l’interieur soient plus similaires que les parcelles entre les blocs. Que ce soit ou non un problème dépendra de la variabilité du terrain et autres conditions entre les blocs.</p>
+<p>De meme, si nous avions 4 agriculteurs, et que chaque agriculteur utilise une parcelle pour chaque traitement, on a alors certainelemt une violation de la condition d’indépendance. Nous ne pouvons pas considérer les agriculteurs sont de simples replications !</p>
+<p>Dans la section suivante, nous verrons comment utiliser des modèles linéaires mixtes pour prendre en compte la dépendance créée par nos designs experimentaux en bloc ou par des producteurs.</p>
 </div>
-<div id="section-model-outputs-and-post-hoc-tests" class="section level3">
-<h3>Model Outputs and Post-Hoc tests</h3>
-<p>In agricultural analyses it is very common to conduct post-hoc analyses from ANOVA models, often referred to as ‘mean separation’. We can do this using the <code>emmeans</code> and <code>multcomp</code> libraries.</p>
-<p>First though, we may want to make some plots - showing the mean values of each of our treatments and including some confidence intervals around these estimates. We can do this using the <code>emmip()</code> function.</p>
-<p>This function needs first the name of the model (in this case <code>anova_mod</code>), then a tilde <code>~</code> followed by the name of the grouping variable (in this case <code>~treat</code>.</p>
+<div id="section-résultats-du-modèle-et-tests-post-hoc" class="section level3">
+<h3>Résultats du modèle et tests post-hoc</h3>
+<p>Dans les analyses de donnees de recherches en agriculture, il est très courant de mener des analyses post-hoc à partir de modèles ANOVA, souvent appelés ‘mean separation’. Nous pouvons le faire en utilisant les packages <code>emmeans</code> et<code>multcomp</code>.</p>
+<p>Cependant, nous voudrons peut-être d’abord créer des graphiques - montrant les valeurs moyennes de chacun de nos traitements et incluant des intervalles de confiance autour de ces estimations. Nous pouvons le faire en utilisant la fonction <code>emmip()</code>.</p>
+<p>Cette fonction nécessite d’abord le nom du modèle (dans ce cas <code>anova_mod</code>), puis un tilde<code>~</code>suivi du nom de la variable de regroupement (dans notre cas <code>~treat</code>).</p>
 <div class="tutorial-exercise" data-label="plotCI" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>emmip(anova_mod,~treat)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-If we want confidence intervals to be included in the plot we also add an option <code>CI=TRUE</code>
+Si nous voulons que les intervalles de confiance soient inclus dans le graphique, nous ajoutons également l’argument <code>CI = TRUE</code>
 <div class="tutorial-exercise" data-label="plotCI2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>emmip(anova_mod,~treat,CI=TRUE)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>This is a really nice function for making plots from models when we increase the complexity of our models, so it is worth learning about now!</p>
-<p>The data in this plot can be extracted using the <code>emmeans()</code> function. We don’t need to ask for confidence intervals this time - they appear anyway!</p>
+<p>C’est une fonction tres utile pour créer des graphiques à partir de modèles lorsque nous augmentons la complexité de ces derniers, donc c’est vraiment bien de la connaitre !</p>
+<p>Les données de ce graphique peuvent être extraites à l’aide de la fonction <code>emmeans()</code>. Nous n’avons pas besoin de demander des intervalles de confiance cette fois - ils apparaissent par defaut !</p>
 <div class="tutorial-exercise" data-label="estimates" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>emmeans(anova_mod,~treat)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>If you wanted to customise the output of <code>emmip</code> so that it looks nicer for your presentations, then you can obtain the numbers underlying the plot from this call to <code>emmeans</code> and then pipe it into <code>ggplot</code>. However we need to first convert the output into a data frame. This is a good opportunity to show you <code>geom_errorbar</code>. This <code>geom</code> requires two additional aesthetics we have not used so far - <code>ymax</code> to represent the top of the error bars and <code>ymin</code> for the bottom of the error bars.</p>
+<p>Si vous vouliez personnaliser la sortie de <code>emmip</code> pour qu’elle soit mieux adaptee a vos présentations ou publications, alors vous pouvez obtenir les chiffres utilises pour l’obtenir avec la fonction <code>emmeans</code>, puis continuer la commande avec un “pipe”, puis <code>ggplot()</code>. Il faudra juste d’abord convertir la sortie en un tableau de données avec la fonction <code>data.frame()</code>.</p>
+<p>C’est une bonne occasion de vous parler de la geometrie <code>geom_errorbar()</code>. Cette <code>geom_</code> nécessite deux nouvelles ‘esthétiques’ que nous n’avons pas utilisées jusqu’à présent -<code>ymax</code> pour représenter le haut des barres d’erreur et <code>ymin</code> pour le bas des barres d’erreur.</p>
 <div class="tutorial-exercise" data-label="geom_err" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>emmeans(anova_mod,~treat) %&gt;%
   data.frame() %&gt;%
@@ -354,20 +357,20 @@ If we want confidence intervals to be included in the plot we also add an option
       geom_errorbar()</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>It is from this output that we can then conduct the mean separation analysis, by piping from this output into the <code>cld()</code> function. “cld” stands for “compact letter display”, which is an alternative name for mean separation.</p>
+<p>C’est à partir de la sortie de <code>emmeans()</code> que nous pouvons ensuite effectuer l’analyse “mean separation” en continuant la commande avec la fonction <code>cld()</code>. “cld” signifie “compact letter display”, qui est un autre nom pour la “mean separation” (separation des moyennes).</p>
 <div class="tutorial-exercise" data-label="cld" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>emmeans(anova_mod,~treat) %&gt;%
   cld()</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>By default this compares groups using the Tukey method, although others are available if you want them. The idea is that we can conclude that any treatments which do not have any overlapping entries in the <code>.group</code> column can be concluded to be significantly different. So here we can see that treatment 1 is significantly higher yielding than all other treatments; treatment 2 is significantly higher yielding than treatments 8,5 and 6, and so on.</p>
-<p>I tend to find agricultural researchers don’t like seeing numbers to denote the groups - and much prefer letters. We can achieve this by adding the option <code>Letters=letters</code>. Note the case of this option!</p>
+<p>Par défaut, <code>cld()</code> compare les moyennes des groupes utilisant la méthodology de “Tukey”, mais d’autres methodologies sont aussi disponibles si vous le souhaitez. L’idée est que nous pouvons conclure que tous les traitements qui n’ont pas de chiffres en communs dans la colonne <code>.group</code> peuvent être considérés comme significativement différents. Nous pouvons donc voir ici que le traitement 1 a un rendement significativement plus élevé que tous les autres traitements (car aucun autre traitement partage le chiffre “4” dans la colonne .groupe); le traitement 2 a un rendement significativement plus élevé que les traitements 8,5 et 6 (car ces traintement ne partagent pas le chiffre “3”), et ainsi de suite.</p>
+<p>J’ai tendance à trouver qu’en recherche en agriculture les gens preferent voire des lettres plutot que des chiffres. Nous pouvons avoir ca en ajoutant l’option <code>Letters=letters</code>. Attention a la casse de cette option !</p>
 <div class="tutorial-exercise" data-label="cld_lets" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>emmeans(anova_mod,~treat) %&gt;%
   cld(Letters=letters)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>You can pipe these letters onto your plot with errorbars similarly to what we saw in the previous section. And this is now a good opportunity to show you another <code>geom</code> - <code>geom_text</code> for adding text onto a plot. This requires another aesthetic - <code>label</code> to represent the column containing the text labels to be plotted.</p>
+<p>Si on le souhaitait, on pourrait ajouter ces lettres sur notre graphique avec les barres d’erreur en utilisant une autre geometrie : <code>geom_text</code> qui permet d’ajouter du texte sur un graphique. Cela nécessite d’utiliser une autre esthétique : <code>label</code> pour indiquer la colonne contenant les étiquettes de texte à afficher.</p>
 <div class="tutorial-exercise" data-label="cld_plot" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>emmeans(anova_mod,~treat) %&gt;%
   cld(Letters=letters) %&gt;% 
@@ -378,7 +381,7 @@ If we want confidence intervals to be included in the plot we also add an option
         geom_text()</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>To make the labels a little bit to the left of the points I am going to use an additional argument within <code>geom_text</code> to move the x position of the label. It is plotted at the moment over the x and y co-ordinates as defined in the aesthetics. But we can use <code>nudge_x</code> and/or <code>nudge_y</code> to move this a little.</p>
+<p>Le texte ajoute au graphique est positionne suivant les coordonnees definies par les esthetiques x et y, et de ce fait il est un peu confondu avec les points. On peut cependent deplacer un peu les étiquettes en utilisant les arguments <code>nudge_x</code> et/ou<code>nudge_y</code>. Par example pour un petit deplacement sur la gauche, on peu donner un faible valeur negative (ici je mets -0.2) a l’argument <code>nudge_x</code></p>
 <div class="tutorial-exercise" data-label="cld_plot2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>emmeans(anova_mod,~treat) %&gt;%
   cld(Letters=letters) %&gt;% 
@@ -391,81 +394,81 @@ If we want confidence intervals to be included in the plot we also add an option
 </div>
 </div>
 </div>
-<div id="section-generalised-linear-model" class="section level2">
-<h2>Generalised Linear Model</h2>
-<p>As we have identified already the assumption that all of our observations are independent may not be reasonable within our design. This is very common in agricultural analyses which will have specific layouts or involve operating with multiple farmers - this will invalidate the assumption that all observations are independent. In these sort of cases we need to move from a “general linear model” into a “generalised linear model” which can account for these structures. This is also known as a mixed model since it contains “fixed effects” (variables we are interested in) and “random” effects (variables outlining the structure or clustering of observations in the data) You can see a presentation of the theory and application of linear mixed models in agriculture here: <a href="https://www.esalq.usp.br/departamentos/lce/arquivos/aulas/2012/LCE5872/MixedModelsPiracicaba.pdf" class="uri">https://www.esalq.usp.br/departamentos/lce/arquivos/aulas/2012/LCE5872/MixedModelsPiracicaba.pdf</a></p>
-<p>Mathematically this is quite a bit more complicated - but thankfully in R it is not very different at all to move towards this model, you will see many of the same functions as in the previous sections. We will use the same libraries we have seen so far, but now also add the <code>lmertest</code> library to be able to fit a “linear mixed effects regression” (<code>lmer()</code>) model. This approach is incredibly flexible and can let us take into account any of the standard agricultural experimental designs as long as we are able to code the random effects appropriately.</p>
-<p>But it also is the exact same approach we need for data which comes from less structured designs - from farm trials and surveys - where we have different forms of clustering (farmers within the same village) or pseudo-replication (the same farmer with multiple plots). It can be tricky to work out exactly how to structure the code for your model, don’t be afraid to ask for help if you are unsure! There are resources at the end of this document which cover many of the more common agricultural designs - but the functions used will all be the same. This even applies to cases where we start to use non-Normal models - such as Poisson regression, for count data, or logistic regression, for binary data. In these cases we use again more or less the same syntax, and all the same functions, but now using the <code>glmer()</code> function, which can account for these modifications to the type of variable we use as a response. It does not matter at all if we have continuous predictor variables, or categorical predictor variables, or a mixture of the two. All these models are fitted and interpreted in R in more or less exactly the same way.</p>
-<div id="section-fitting-the-model-1" class="section level3">
-<h3>Fitting the model</h3>
-<p>In this design, an RCBD, we have one treatment factor, “treat”, and one layout factor “rep”. If we want to take into account this repeated blocks layout structure, we can’t use the “lm” function anymore and instead we need to include the “rep” blocking factor into the specification of a linear mixed effect model. Using the <code>lmer()</code> function to include a blocking factors, or “random effects” as they are known in statistics, we use a slightly different style of code. We use brackets and then within the brackets we write <code>1|variablename</code> , so in this case <code>(1|rep)</code>. Then the rest of the model code is the same as before - this time I will store as an object called <code>gen_lin_mod</code>.</p>
+<div id="section-modèle-linéaire-mixte-et-généralisé" class="section level2">
+<h2>Modèle linéaire mixte et généralisé</h2>
+<p>Comme nous l’avons dit avant, il ne semble pas raisonnable d’accepter la condition d’indépendance entre nos observations. Ceci est très courant dans les analyses de données en recherche en agriculture ou l’on a souvent des designs experimentaux avec une certaines structure (souvent en blocs) ou des experiences menés chez plusieurs agriculteurs ou les observations collectees par un agriculteur ne peuvent pas etre considerées comme indépendantes, car l’agriculteur travail avec ses propres techniques dans sur un champ situe a un endroit particulier etc. Dans ce genre de cas, nous devons passer d’un modèle linéaire relativement “simple” à un “modèle linéaire mixte” qui est appelé de cette facon car il contient des effets “fixes” (variables qui nous intéressent) et des effets “aléatoires” (variables décrivant la structure ou le regroupement des observations dans les données) Vous pouvez voir une présentation de la théorie et de l’application de modèles linéaires mixtes en agriculture ici: <a href="https://www.esalq.usp.br/departamentos/lce/arquivos/aulas/2012/LCE5872/MixedModelsPiracicaba.pdf" class="uri">https://www.esalq.usp.br/departamentos/lce/arquivos/aulas/2012/LCE5872/MixedModelsPiracicaba.pdf</a></p>
+<p>Mathématiquement, c’est un peu plus compliqué que ce que l’on a vu avant, mais dans R, ce n’est pas si différent, et vous verrez que l’on va utiliser une bonne partie des fonctions que l’on a utilisé dans les sections précédentes. Nous utiliserons les mêmes packages, mais ajouterons maintenant aussi le package <code>lmertest</code> pour pouvoir ajuster un modèle de “régression linéaire à effets mixtes” (<code>lmer()</code>). Ce genre de modeles est tres flexible et peut nous permettre de prendre en compte n’importe lequel des modèles expérimentaux standards utilisés en agriculture, tant que nous avons a disposition les données nécessaires pour definir la structure de nos experiences.</p>
+<p>Mais ce genre de modeles est aussi tres adapte pour modeliser des données d’essais et d’enquêtes pour lesquels nous avons d’autres types de regroupement (agriculteurs dans le même village) ou des pseudo-réplications (le même agriculteur a plusieurs parcelles). Il peut être difficile de déterminer exactement comment structurer le code pour votre modèle, donc n’ayez pas peur de demander de l’aide si vous n’êtes pas sûr! Il y a des ressources à la fin de ce document qui couvrent bon nombre des designs experimentaux courants en agriculture (notez que les fonctions utilisées restent les mêmes quelque soit le design).</p>
+<div id="section-ajustement-du-modèle" class="section level3">
+<h3>Ajustement du modèle</h3>
+<p>Nos donnees proviennent d’un design RCBD (design en blocs complets randomisés) avec 4 blocs et 9 traitements. Nous avons donc un facteur de traitement, “treat”, et un facteur indiquant la disposition en bloc, “rep”. Si nous voulons prendre en compte cette structure de disposition en blocs répétés, nous ne pouvons plus utiliser la fonction “lm” et nous devons à la place inclure le facteur “rep” dans la spécification d’un modèle linéaire à effets mixtes en utilisant la fonction <code>lmer()</code>. La syntaxe utilisee pour cette fonction est similaire a celle de <code>lm()</code>, mais il faut dans notre formule ajouter un ‘+’, puis indiquer la structure en écrivant entre parenthese <code>1|variable_de_structure</code>, donc dans ce cas on va ecrire <code>+ (1|rep)</code>. Ensuite, le reste du code du modèle est le même qu’avant :</p>
 <div class="tutorial-exercise" data-label="glm" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>gen_lin_mod&lt;-lmer(yield~treat+(1|rep),data=fallow)</code></pre>
+<pre class="text"><code>mod_mixte&lt;-lmer(yield~treat+(1|rep),data=fallow)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>Again - to get anything useful out of the model we need to use additional functions - we can start with <code>summary()</code>.</p>
+<p>Comme avant, pour avoir des informations utiles sur l’ajustement de notre modèle, nous devons utiliser des fonctions supplémentaires - nous pouvons commencer par <code>summary()</code>.</p>
 <div class="tutorial-exercise" data-label="glm2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>summary(gen_lin_mod)</code></pre>
+<pre class="text"><code>summary(mod_mixte)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>The output looks a little different after we summarise a mixed effects model, although most things remain very similar. The table of coefficients is the same as before and has the same interpretation. The additional output showing the correlation between fixed effects is not very useful for us here, as in this designed experiment all treatments are replicated the same number of times.</p>
-<p>The residual error term is still presented but in a different place - this value is 0.4843 which can be found in the “Random Effects” table. This sort of model breaks down the variance into that which can be explained by our design factors (the <code>rep</code> term) and that which is left over as residual variance. Comparing the amount of the variance explained by each component can be useful to give us an understanding of how much our design factors are influencing our outcome variable. In this case the amount of variance explained by the <code>rep</code> (standard deviation = 0.1175) is fairly small in relation to the residual variance (standard deviation = 0.4843).</p>
-<p>One thing which is missing when we compared to output of running <code>summary</code> after an <code>lm</code> is the R-squared value. This can be optained by using the function <code>r.squaredGLMM</code> which comes from the <code>MuMIn</code> library.</p>
+<p>La sortie semble un peu différente après avoir résumé un modèle à effets mixtes, bien que la plupart des choses restent très similaires. Le tableau des coefficients est le même que précédemment et a la même interprétation. La sortie supplémentaire montrant la corrélation entre les effets fixes n’est pas très utile pour nous ici, car dans cette expérience conçue, tous les traitements sont répliqués le même nombre de fois.</p>
+<p>Le terme d’erreur résiduelle est toujours présenté mais à un endroit différent - cette valeur est 0,4843 qui peut être trouvée dans le tableau “Effets aléatoires”. Ce type de modèle décompose la variance en ce qui peut être expliqué par nos facteurs de conception (le terme <code>rep</code>) et ce qui reste en tant que variance résiduelle. La comparaison du montant de la variance expliquée par chaque composante peut être utile pour nous donner une idée de la mesure dans laquelle nos facteurs de conception influencent notre variable de résultat. Dans ce cas, la quantité de variance expliquée par le <code>rep</code> (écart-type = 0,1175) est assez faible par rapport à la variance résiduelle (écart-type = 0,4843).</p>
+<p>Une chose qui manque lorsque nous comparons à la sortie de l’exécution de <code>summary</code> après un <code>lm</code> est la valeur R au carré. Ceci peut être choisi en utilisant la fonction <code>r.squaredGLMM</code> qui provient de la bibliothèque <code>MuMIn</code>.</p>
 <div class="tutorial-exercise" data-label="r2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>r.squaredGLMM(gen_lin_mod)</code></pre>
+<pre class="text"><code>r.squaredGLMM(mod_mixte)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>Two versions of R-squared as shown - the marginal R square <code>R2m</code>- which shows only the variance explained by the “fixed effects” in this case the treatment term. The conditional R-squared <code>R2c</code> shows the effect of both the fixed and random effects - so includes both <code>rep</code> and <code>treat</code>. So we can see 81% of the variability in yield is explained by the different treatments, and this increases to 82.3% is we include rep as well.</p>
-<p>To obtain an ANOVA table - we can obtain this as before using <code>anova(model)</code></p>
+<p>Deux versions de R-carré comme indiqué - le carré marginal R <code>R2m</code>- qui ne montre que la variance expliquée par les “effets fixes” dans ce cas le terme de traitement. Le R carré conditionnel <code>R2c</code> montre l’effet à la fois des effets fixes et aléatoires - donc inclut à la fois <code>rep</code> et <code>treat</code>. Ainsi, nous pouvons voir que 81% de la variabilité du rendement est expliquée par les différents traitements, et cela augmente à 82,3% si nous incluons également le rep.</p>
+<p>Pour obtenir une table ANOVA - nous pouvons l’obtenir comme avant d’utiliser <code>anova(model)</code></p>
 <div class="tutorial-exercise" data-label="glm_anova" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>anova(gen_lin_mod)</code></pre>
+<pre class="text"><code>anova(mod_mixte)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>The ANOVA table only includes the fixed effects - showing us a highly significant p-value for treatment, providing evidence of some overall differences between our treatments. We could also test whether our random effects are significant using <code>ranova</code>.</p>
+<p>Le tableau ANOVA n’inclut que les effets fixes - nous montrant une valeur p très significative pour le traitement, fournissant la preuve de certaines différences globales entre nos traitements. Nous pourrions également tester si nos effets aléatoires sont significatifs en utilisant <code>ranova</code>.</p>
 <div class="tutorial-exercise" data-label="ranova" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>ranova(gen_lin_mod)</code></pre>
+<pre class="text"><code>ranova(mod_mixte)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>This does not show us a significant effect of the different <code>reps</code> we have in the data. However because this variable is describing the structure of our data, this is usually not something we are particularly interested in. With structural variables, we generally want to account for any impact they may have on the analysis whether or not they could be considered to be statistically significant. But to help your understanding, note that this non-significance would suggest that the results we got from the last section using the “lm” function was probably somewhat reliable, despite not having taken into account the layout structure in blocks.</p>
+<p>Cela ne nous montre pas un effet significatif des différents <code>reps</code> que nous avons dans les données. Cependant, comme cette variable décrit la structure de nos données, ce n’est généralement pas quelque chose qui nous intéresse particulièrement. Avec les variables structurelles, nous voulons généralement tenir compte de tout impact qu’elles peuvent avoir sur l’analyse, qu’elles puissent ou non être considérées comme statistiquement significatif. Mais pour vous aider à comprendre, notez que cette non-signification suggérerait que les résultats que nous avons obtenus de la dernière section en utilisant la fonction “lm” étaient probablement assez fiables, bien que n’ayant pas pris en compte la structure de mise en page en blocs.</p>
 </div>
-<div id="section-check-the-model" class="section level3">
-<h3>Check the model</h3>
-<p>We have many of the same assumptions to check with this model as well, although the functions here work a little differently to before.</p>
-<p>The function <code>plot()</code> will only plot the fitted values from the model against the expected values.</p>
+<div id="section-vérifiez-le-modèle" class="section level3">
+<h3>Vérifiez le modèle</h3>
+<p>Nous avons également plusieurs des mêmes hypothèses à vérifier avec ce modèle, bien que les fonctions ici fonctionnent un peu différemment d’avant.</p>
+<p>La fonction <code>plot()</code> tracera uniquement les valeurs ajustées du modèle par rapport aux valeurs attendues.</p>
 <div class="tutorial-exercise" data-label="glm_plt" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>plot(gen_lin_mod)</code></pre>
+<pre class="text"><code>plot(mod_mixte)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>We can check most of the key assumptions from this one plot. The residual Vs fitted plot is a scatter plot of the Residuals on the y-axis and the fitted on the x-axis and the aim for this plot is to test the assumption of equal variance of the residuals across the range of fitted values. Since the residuals do not funnel out (to form triangular/diamond shape) the assumption of equal variance is met.</p>
-<p>We can also see that there are no extreme values in the residuals which might be potentially causing problems with the validity of our conclusions (leverage)</p>
-<p>To assess the assumption of approximate normality we can produce the same plot as before if we extract the residuals and use the function <code>qqnorm</code>. This shows us how closely the residuals follow a normal distribution - if there are severe and systematic deviations from the line then we may want to consider an alternative distribution. The most elegant way of doing this is to use pipes - firstly to obtain the residuals and then to pipe those residuals into the <code>qqnorm</code> function..</p>
+<p>Nous pouvons vérifier la plupart des hypothèses clés de ce graphique. Le graphique ajusté Vs résiduel est un nuage de points des résidus sur l’axe des y et l’ajustement sur l’axe des x et le but de ce graphique est de tester l’hypothèse d’une variance égale des résidus sur la plage des valeurs ajustées. Puisque les résidus ne s’évaporent pas (pour former une forme triangulaire/losange), l’hypothèse d’une variance égale est satisfaite.</p>
+<p>Nous pouvons également voir qu’il n’y a pas de valeurs extrêmes dans les résidus qui pourraient potentiellement causer des problèmes avec la validité de nos conclusions (effet de levier)</p>
+<p>Pour évaluer l’hypothèse de normalité approximative, nous pouvons produire le même graphique que précédemment si nous extrayons les résidus et utilisons la fonction <code>qqnorm</code>. Cela nous montre à quel point les résidus suivent une distribution normale - s’il y a des écarts graves et systématiques par rapport à la droite, nous pouvons alors envisager une distribution alternative. La façon la plus élégante de faire ceci est d’utiliser des tubes - d’abord pour obtenir les résidus et ensuite pour canaliser ces résidus dans la fonction <code>qqnorm</code>..</p>
 <div class="tutorial-exercise" data-label="qqplot" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>gen_lin_mod %&gt;%
+<pre class="text"><code>mod_mixte %&gt;%
    resid() %&gt;%
       qqnorm() </code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>In this case the residuals seem to fit the assumption required for normality.</p>
+<p>Dans ce cas, les résidus semblent correspondre à l’hypothèse requise pour la normalité.</p>
 </div>
-<div id="section-post-hoc-tests" class="section level3">
-<h3>Post-hoc tests</h3>
-<p>The functions we saw in the previous section, <code>emmip</code> and <code>emmeans</code> and <code>cld</code> all work in exactly the same way. All we need to change is the input model object, and we obtain the plots with confidence intervals and the mean seperation analysis.</p>
+<div id="section-tests-de-post-hoc" class="section level3">
+<h3>Tests de post-hoc</h3>
+<p>Les fonctions que nous avons vues dans la section précédente, <code>emmip</code> et <code>emmeans</code> et <code>cld</code> fonctionnent toutes exactement de la même manière. Tout ce que nous devons changer est l’objet du modèle d’entrée, et nous obtenons les graphiques avec des intervalles de confiance et l’analyse de séparation moyenne.</p>
 <div class="tutorial-exercise" data-label="emmip_glm" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>emmip(gen_lin_mod,~treat,CIs = TRUE)</code></pre>
+<pre class="text"><code>emmip(mod_mixte,~treat,CIs = TRUE)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
 <div class="tutorial-exercise" data-label="cldglm" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>emmeans(gen_lin_mod, ~treat) %&gt;%
+<pre class="text"><code>emmeans(mod_mixte, ~treat) %&gt;%
   cld(Letters=letters)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<p>In the output, groups sharing a letter in the .group are not statistically different from each other as before.</p>
-<p>Using the example from the previous section, see if you can write the code to make a plot showing the results from the <code>lmer</code> model including the letter displays and the error bars</p>
+<p>Dans la sortie, les groupes partageant une lettre dans le .group ne sont pas statistiquement différents les uns des autres comme auparavant.</p>
+<p>En utilisant l’exemple de la section précédente, voyez si vous pouvez écrire le code pour créer un tracé montrant les résultats du modèle <code>lmer</code>, y compris les lettres et les barres d’erreur.</p>
 <div class="tutorial-exercise" data-label="cldplt" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="cldplt-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>emmeans(gen_lin_mod, ~treat) %&gt;%
+<pre class="text"><code>emmeans(mod_mixte, ~treat) %&gt;%
   cld(Letters=letters)  %&gt;% 
   data.frame() %&gt;%
   ggplot(aes(y=emmean,x=treat,ymin=lower.CL,ymax=upper.CL,label=.group))+
@@ -474,36 +477,36 @@ If we want confidence intervals to be included in the plot we also add an option
         geom_text(nudge_x=-0.2)</code></pre>
 </div>
 </div>
-<div id="section-model-choices" class="section level3">
-<h3>Model choices</h3>
-<p>Ultimately our model fitted using a generalised linear mixed model, with a random effect to account for block, using <code>lmer</code> provided almost identical results to the standard linear model fitted using <code>lm</code>. However, this is because the blocking in this experiment had very little impact on the results - it was an on-station trial with very controlled conditions and similar environments across the four blocks. In increasingly complex situations, particularly those with farmers conducting multiple treatments or with clusters of farmers in very different situations, very different results would be obtained from these two modelling approaches. Plots on one farmers field will be similar to other plots on the same field but likely extremely different to another farmer’s plots. In cases where very different results are found then it is usually worth trying to understand why! You will see an example of thi in the exercises. Don’t be afraid to ask for help in these situations.</p>
+<div id="section-choix-du-modèle" class="section level3">
+<h3>Choix du modèle</h3>
+<p>Et les fonctions a utiliser lorsque l’on s’occupe de donnees aux distributions qui ne sont pas normales nCela s’applique même aux cas où nous commençons à utiliser des modèles non normaux - comme la régression de Poisson, pour les données de dénombrement, ou la régression logistique, pour les données binaires. Dans ces cas, nous utilisons à nouveau plus ou moins la même syntaxe, et toutes les mêmes fonctions, mais maintenant en utilisant la fonction <code>glmer()</code>, qui peut rendre compte de ces modifications du type de variable que nous utilisons comme réponse. Peu importe que nous ayons des variables prédictives continues, ou des variables prédictives catégorielles, ou un mélange des deux. Tous ces modèles sont ajustés et interprétés en R plus ou moins exactement de la même manière.</p>
+<p>Finalement, notre modèle ajusté en utilisant un modèle mixte linéaire généralisé, avec un effet aléatoire pour tenir compte du bloc, en utilisant <code>lmer</code> a fourni des résultats presque identiques au modèle linéaire standard ajusté en utilisant <code>lm</code>. Cependant, c’est parce que le blocage dans cette expérience a eu très peu d’impact sur les résultats - il s’agissait d’un essai en station avec des conditions très contrôlées et des environnements similaires sur les quatre blocs. Dans des situations de plus en plus complexes, en particulier celles avec des agriculteurs effectuant des traitements multiples ou avec des grappes d’agriculteurs dans des situations très différentes, des résultats très différents seraient obtenus à partir de ces deux approches de modélisation. Les parcelles d’un champ d’agriculteurs seront similaires aux autres parcelles du même champ, mais probablement extrêmement différentes des parcelles d’un autre agriculteur. Dans les cas où des résultats très différents sont trouvés, il vaut généralement la peine d’essayer de comprendre pourquoi! Vous en verrez un exemple dans les exercices. N’ayez pas peur de demander de l’aide dans ces situations.</p>
 </div>
 </div>
-<div id="section-methodological-principles" class="section level2">
-<h2>Methodological Principles</h2>
-<p>There are always many different ways of doing all that we have done here in R. If you look for guidance online about how to analyse particular designs you may find lots of different options for analysing “split plot” designs or “survey” data. It is always a good idea to ask for help when starting to analyse data if you are not sure about the way it should be analysed - you should make sure however you analyse the data it is done in a way which lets you address the questions that are most relevant to you. This is the big advantage of using the approach shown in this tutorial of the <code>lmer</code> and <code>lm</code> functions - they are incredibly flexible and can be used in many different situations.</p>
-<p>For instance, we demonstrated fitting our model as a linear mixed effect model rather than traditional ANOVA. Although the analysis in this instance was not effected too much by this change the <code>lmer</code> model has a number of other advantages as well:</p>
+<div id="section-principes-méthodologiques" class="section level2">
+<h2>Principes méthodologiques</h2>
+<p>Il existe toujours de nombreuses façons différentes de faire tout ce que nous avons fait ici dans R. Si vous recherchez des conseils en ligne sur la façon d’analyser des conceptions particulières, vous trouverez peut-être de nombreuses options différentes pour analyser des conceptions de “parcelles fractionnées” ou des données “d’enquête”. C’est toujours une bonne idée de demander de l’aide lorsque vous commencez à analyser des données si vous n’êtes pas sûr de la façon dont elles doivent être analysées - vous devez vous assurer que vous analysez les données de manière à vous permettre de répondre aux questions qui sont les plus pertinentes pour vous. C’est le grand avantage d’utiliser l’approche montrée dans ce tutoriel des fonctions <code>lmer</code> et<code>lm</code> - elles sont incroyablement flexibles et peuvent être utilisées dans de nombreuses situations différentes.</p>
+<p>Par exemple, nous avons démontré l’ajustement de notre modèle comme un modèle linéaire à effets mixtes plutôt qu’une ANOVA traditionnelle. Bien que l’analyse dans ce cas n’ait pas été trop affectée par ce changement, le modèle <code>lmer</code> présente également un certain nombre d’autres avantages:</p>
 <ol style="list-style-type: decimal">
-<li>They are very flexible especially where we have repeated measures, for instance you don’t need to have the same number of observations per subject/treatment.</li>
-<li>Ability to account for a series of random effects. Not only are farms/farmers/plots…. different from each other, but things with in farms/plots….. also differ . Not taking these sources of variation into account will lead to underestimations of accuracy.</li>
-<li>Allows for generalization of non-normal data.<br />
-</li>
-<li>Handling missing data: If the percentage of missing data is small and that data missing is a random sample of the data set,data from the observations with missing data can be analysed with <code>lmer</code> (unlike other packages that would do listwise deletion).</li>
-<li>Takes into account variation that is explained by the predictor variables of interest ie fixed effects and variation that is not explained by these predictors ie random effects.</li>
+<li>Ils sont très flexibles, en particulier lorsque nous avons des mesures répétées, par exemple, vous n’avez pas besoin d’avoir le même nombre d’observations par sujet/traitement.</li>
+<li>Capacité à tenir compte d’une série d’effets aléatoires. Non seulement les fermes/agriculteurs/parcelles…. différents les uns des autres, mais les choses dans les fermes/parcelles… .. diffèrent également. Ne pas tenir compte de ces sources de variation conduira à des sous-estimations de l’exactitude.</li>
+<li>Permet la généralisation des données non normales.</li>
+<li>Traitement des données manquantes: Si le pourcentage de données manquantes est petit et que les données manquantes sont un échantillon aléatoire du jeu de données, les données des observations avec des données manquantes peuvent être analysées avec <code>lmer</code> (contrairement aux autres packages qui effectueraient une suppression par liste ).</li>
+<li>Prend en compte la variation expliquée par les variables prédictives d’intérêt, c’est-à-dire les effets fixes et la variation qui n’est pas expliquée par ces prédicteurs, c’est-à-dire les effets aléatoires.</li>
 </ol>
 </div>
-<div id="section-exercises" class="section level2">
-<h2>Exercises</h2>
-<p>As in the last module it is now up to you to use RStudio to complete the exercises on your own computer.</p>
-<p>You can download the files you need <a href="https://github.com/stats4sd/R4CCRP_07Models/blob/main/Exercises.zip?raw=true">by clicking on this link here</a></p>
-<p>Make sure you unzip these into a new folder, and then start a new project file based on that folder, like we learnt in the previous module.</p>
-<p>You should need to install some of the packages used before proceeding. Make sure you have these installed and loaded, by running the first code chunk, before you try to start solving any of the questions!</p>
+<div id="section-exercices" class="section level2">
+<h2>Exercices</h2>
+<p>Comme dans le dernier module, c’est maintenant à vous d’utiliser RStudio pour effectuer les exercices sur votre propre ordinateur.</p>
+<p>Vous pouvez télécharger les fichiers dont vous avez besoin <a href="https://github.com/stats4sd/R4CCRP_07Models/blob/main/Exercises.zip?raw=true">en cliquant sur ce lien ici</a></p>
+<p>Assurez-vous de les décompresser dans un nouveau dossier, puis démarrez un nouveau fichier de projet basé sur ce dossier, comme nous l’avons appris dans le module précédent.</p>
+<p>Vous devrez probablement installer certains des packages utilisés avant de continuer. Assurez-vous de les avoir installés et chargés, en exécutant le premier morceau de code, avant d’essayer de résoudre l’une des questions!</p>
 </div>
-<div id="section-more-examples-of-analysis" class="section level2">
-<h2>More examples of analysis</h2>
-<p>You can find more examples in a similar style here: <a href="https://shiny.stats4sd.org/AgAnalysis/" class="uri">https://shiny.stats4sd.org/AgAnalysis/</a></p>
-<p>A more wide ranging set of agricultural analysis can be seen here: <a href="https://rstats4ag.org/" class="uri">https://rstats4ag.org/</a></p>
-<p>There are also specific packages for other types of agricultural analyses, like the <code>agricolae</code> library. There is an extensive tutorial on the analysis and design functions included in this package here: <a href="https://pbil.univ-lyon1.fr/CRAN/web/packages/agricolae/vignettes/tutorial.pdf" class="uri">https://pbil.univ-lyon1.fr/CRAN/web/packages/agricolae/vignettes/tutorial.pdf</a></p>
+<div id="section-autres-exemples-danalyse" class="section level2">
+<h2>Autres exemples d’analyse</h2>
+<p>Vous pouvez trouver plus d’exemples dans un style similaire ici: <a href="https://shiny.stats4sd.org/AgAnalysis/" class="uri">https://shiny.stats4sd.org/AgAnalysis/</a></p>
+<p>Un ensemble plus large d’analyses agricoles peut être vu ici: <a href="https://rstats4ag.org/" class="uri">https://rstats4ag.org/</a></p>
+<p>Il existe également des packages spécifiques pour d’autres types d’analyses agricoles, comme la bibliothèque <code>agricolae</code>. Il existe un tutoriel complet sur les fonctions d’analyse et de conception incluses dans ce package ici: <a href="https://pbil.univ-lyon1.fr/CRAN/web/packages/agricolae/vignettes/tutorial.pdf" class="uri">https://pbil.univ-lyon1.fr/CRAN/web/packages/agricolae/vignettes/tutorial.pdf</a></p>
 
 <script type="application/shiny-prerendered" data-context="server-start">
 library(learnr)
@@ -519,7 +522,7 @@ fallow <- read.csv("Fallow N2.csv")
 
 linreg_mod<-lm(yield~striga,data=fallow)
 anova_mod<-lm(yield~treat,data=fallow)
-gen_lin_mod<-lmer(yield~treat+(1|rep),data=fallow)
+mod_mixte<-lmer(yield~treat+(1|rep),data=fallow)
 
 </script>
  
@@ -777,7 +780,7 @@ output$`tutorial-exercise-cldplt-output` <- renderUI({
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","boot","broom","bslib","cellranger","cli","codetools","colorspace","compiler","crayon","crosstalk","datasets","DBI","dbplyr","digest","dplyr","DT","ellipsis","emmeans","estimability","evaluate","fansi","farver","fastmap","forcats","fs","generics","ggplot2","glue","graphics","grDevices","grid","gtable","haven","highr","hms","htmltools","htmlwidgets","httpuv","httr","jquerylib","jsonlite","knitr","labeling","later","lattice","learnr","lifecycle","lme4","lmerTest","lubridate","magrittr","markdown","MASS","Matrix","methods","mime","minqa","modelr","multcomp","multcompView","MuMIn","munsell","mvtnorm","nlme","nloptr","numDeriv","pillar","pkgconfig","promises","purrr","R6","Rcpp","readr","readxl","renv","reprex","rlang","rmarkdown","rprojroot","rstudioapi","rvest","sandwich","sass","scales","shiny","splines","statmod","stats","stats4","stringi","stringr","survival","TH.data","tibble","tidyr","tidyselect","tidyverse","tools","utf8","utils","vctrs","withr","xfun","xml2","xtable","yaml","zoo"]},{"type":"character","attributes":{},"value":["0.2.1","1.2.1","4.0.3","1.3-25","0.7.5","0.2.4","1.1.0","2.3.1","0.2-16","2.0-0","4.0.3","1.4.1","1.1.1","4.0.3","1.1.1","2.1.0","0.6.27","1.0.5","0.17","0.3.1","1.5.4","1.3","0.14","0.4.2","2.1.0","1.1.0","0.5.1","1.5.0","0.1.0","3.3.3","1.4.2","4.0.3","4.0.3","4.0.3","0.3.0","2.3.1","0.8","1.0.0","0.5.1.1","1.5.3","1.5.5","1.4.2","0.1.3","1.7.2","1.31","0.4.2","1.1.0.1","0.20-41","0.10.1","1.0.0","1.1-26","3.1-3","1.7.10","2.0.1","1.1","7.3-53","1.2-18","4.0.3","0.10","1.2.4","0.1.8","1.4-16","0.1-8","1.43.17","0.5.0","1.1-1","3.1-149","1.2.2.2","2016.8-1.1","1.5.1","2.0.3","1.2.0.1","0.3.4","2.5.0","1.0.6","1.4.0","1.3.1","0.12.5","1.0.0","0.4.10","2.7","2.0.2","0.13","0.3.6","3.0-0","0.3.1","1.1.1","1.6.0","4.0.3","1.4.35","4.0.3","4.0.3","1.5.3","1.4.0","3.2-7","1.0-10","3.1.0","1.1.3","1.1.0","1.3.0","4.0.3","1.1.4","4.0.3","0.3.6","2.4.1","0.21","1.3.2","1.8-4","2.2.1","1.8-8"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","boot","broom","bslib","cellranger","cli","codetools","colorspace","compiler","crayon","crosstalk","datasets","DBI","dbplyr","digest","dplyr","DT","ellipsis","emmeans","estimability","evaluate","fansi","farver","fastmap","forcats","fs","generics","ggplot2","glue","graphics","grDevices","grid","gtable","haven","highr","hms","htmltools","htmlwidgets","httpuv","httr","jquerylib","jsonlite","knitr","labeling","later","lattice","learnr","lifecycle","lme4","lmerTest","lubridate","magrittr","markdown","MASS","Matrix","methods","mime","minqa","modelr","multcomp","multcompView","MuMIn","munsell","mvtnorm","nlme","nloptr","numDeriv","pillar","pkgconfig","promises","purrr","R6","Rcpp","readr","readxl","renv","reprex","rlang","rmarkdown","rprojroot","rstudioapi","rvest","sandwich","sass","scales","shiny","splines","statmod","stats","stats4","stringi","stringr","survival","TH.data","tibble","tidyr","tidyselect","tidyverse","tools","utf8","utils","vctrs","withr","xfun","xml2","xtable","yaml","zoo"]},{"type":"character","attributes":{},"value":["0.2.1","1.2.1","4.0.4","1.3-26","0.7.5","0.2.4","1.1.0","2.3.1","0.2-18","2.0-0","4.0.4","1.4.1","1.1.1","4.0.4","1.1.1","2.1.0","0.6.27","1.0.5","0.17","0.3.1","1.5.4","1.3","0.14","0.4.2","2.1.0","1.1.0","0.5.1","1.5.0","0.1.0","3.3.3","1.4.2","4.0.4","4.0.4","4.0.4","0.3.0","2.3.1","0.8","1.0.0","0.5.1.1","1.5.3","1.5.5","1.4.2","0.1.3","1.7.2","1.31","0.4.2","1.1.0.1","0.20-41","0.10.1","1.0.0","1.1-26","3.1-3","1.7.10","2.0.1","1.1","7.3-53","1.3-2","4.0.4","0.10","1.2.4","0.1.8","1.4-16","0.1-8","1.43.17","0.5.0","1.1-1","3.1-152","1.2.2.2","2016.8-1.1","1.5.1","2.0.3","1.2.0.1","0.3.4","2.5.0","1.0.6","1.4.0","1.3.1","0.12.5","1.0.0","0.4.10","2.7","2.0.2","0.13","0.3.6","3.0-0","0.3.1","1.1.1","1.6.0","4.0.4","1.4.35","4.0.4","4.0.4","1.5.3","1.4.0","3.2-7","1.0-10","3.1.0","1.1.3","1.1.0","1.3.0","4.0.4","1.1.4","4.0.4","0.3.6","2.4.1","0.21","1.3.2","1.8-4","2.2.1","1.8-8"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>
@@ -791,7 +794,7 @@ output$`tutorial-exercise-cldplt-output` <- renderUI({
 
 <!-- begin doc-metadata -->
 <div id="doc-metadata">
-<h2 class="title toc-ignore" style="display:none;">Statistical Models in R</h2>
+<h2 class="title toc-ignore" style="display:none;">Modélisation statistique avec R</h2>
 </div>
 <!-- end doc-metadata -->
 
